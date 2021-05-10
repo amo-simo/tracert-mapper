@@ -1,18 +1,17 @@
 import os
 import re
-import ipinfo
-
+import gmplot
 
 def traceroute(address):
-    print("starting traceroute")
+    print("Starting traceroute...")
     raw = os.popen("tracert "+address).read()
-    #print(raw)
     addresses = []
+
+    #Regex that finds all the IP addresses in tracert's output
     for add in re.findall(r"((\d{1,3}\.){3}\d)", raw):
         addresses.append(add[0])
 
-    #the target address
-    #t_address = addresses[0]
+    #Removes the target's and router's IP addresses
     addresses.pop(0)
     addresses.pop(0)
 
@@ -21,12 +20,18 @@ def traceroute(address):
 def getLocation(address, handler):
     #just send me location
     try:
+        #gets the location of the ip address using ipinfo's api and returns coordinates as floats
         loc_raw = handler.getDetails(ip_address=address).loc.split(',')
         return float(loc_raw[0]), float(loc_raw[1])
+
     except AttributeError:
-        #print(f"failed to get location for {0}".format(address))
+        #returns 0 on failure, happens when trying to locate 10.x.x.x addresses
         return 0
 
-if __name__=="__main__":
-    for i in traceroute("facebook.com"):
-        print(f"{i}: {getLocation(i,handle)}")
+def mapDrawer(plotter, loc_list, outfile, u_loc):
+    path = zip(*loc_list)
+    plotter.plot(*path, edge_width=2, color='#00FF00')
+    plotter.marker(u_loc[0], u_loc[1], color='red',title='You')
+    plotter.marker(loc_list[-1][0], loc_list[-1][1], color='blue', title='endpoint')
+    plotter.draw(outfile)
+    print(f"Map successfully drawn on {outfile}")
