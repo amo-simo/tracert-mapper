@@ -30,7 +30,8 @@ def getLocation(address, handler):
 
 def mapDrawer(plotter, loc_list, outfile, u_loc):
     path = zip(*loc_list)
-    plotter.plot(*path, edge_width=2, color='green')
+    plotter.plot(*path, edge_width=2, color='#00FF00')
     plotter.marker(u_loc[0], u_loc[1], color='red',title='You')
     plotter.marker(loc_list[-1][0], loc_list[-1][1], color='blue', title='endpoint')
     plotter.draw(outfile)
+    print(f"Map successfully drawn on {outfile}")
